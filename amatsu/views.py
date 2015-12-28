@@ -8,6 +8,8 @@ from amatsu import models
 import requests
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
+import hasher
+import re
 
 def index(request):
   template = django.template.loader.get_template("index.html")
@@ -19,32 +21,52 @@ def index(request):
 def toHomepage(request):
   return django.shortcuts.redirect("/kaze/")
 
-def redirect(request):
-  template = django.template.loader.get_template("index2.html")
-  context = RequestContext(request, {})
-  html = template.render(context)
-  return HttpResponse(html)
+def redirect(request,hashed=None):
+  print "hashed =",hashed
+  if hashed == None:
+    return django.shortcuts.redirect("/kaze/")
+
+  print hashed
+  check = models.Url.objects.filter(hashOfUrl=hashed)
+  if len(check) >0:
+    destUrl = check[0].fullUrl
+    check[0].hits += 1
+    check[0].save()
+    return django.shortcuts.redirect(destUrl)
+  else:
+    return django.shortcuts.redirect("http://localhost:8000/kaze/")
 
 def api(request):
   print request.POST
   url = request.POST["url"]
 
-  validator = URLValidator(verify_exists=False)
+  validator = URLValidator()
+
   try:
     validator(url)
+    check = models.Url.objects.filter(fullUrl=url)
+    if len(check) >0:
+      returnUrl = check[0].shortenedUrl
+      print "already exists",returnUrl
+      return HttpResponse(returnUrl, content_type="text/plain")
 
     hashed = url
-    collission = False
-    while not collission:
-      hashed = hashlib.md5(hashed).hexdigest()[:6]
-      print hashed
+    collission = True
+    while collission:
+      hashed = hasher.returnShortenedURL(hashed)
 
-    urlObj = models.Url(FullUrl=url,hashOfUrl=hashed,shortenedUrl=returnUrl)
+      if len(models.Url.objects.filter(hashOfUrl=hashed)) == 0:
+        collission = False
+    #returnUrl = "http://amat.su/"+hashed
+    returnUrl = "http://localhost:8000/"+hashed
+    urlObj = models.Url(fullUrl=url,hashOfUrl=hashed,shortenedUrl=returnUrl,hits=0)
     urlObj.save()
+
     return HttpResponse(returnUrl, content_type="text/plain")
   except ValidationError, e:
+
     print e
-    return HttpResponse("Nope", content_type="text/plain")
+    return HttpResponse("Please enter a valid and full url!", content_type="text/plain")
 
 
 

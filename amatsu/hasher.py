@@ -50,7 +50,7 @@ def base64(inp):
   return output
 
 def returnShortenedURL(inp):
-  v =  returnHash(link)
+  v = returnHash(inp)
   s = shorten(v)
   return base64(s)
 
