@@ -1,0 +1,7 @@
+*.DS_Store
+*foo.py
+*settings*
+*.pyc
+*.sqlite3
+*.db
+
