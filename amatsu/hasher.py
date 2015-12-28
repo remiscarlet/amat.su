@@ -59,21 +59,3 @@ def decodeBase64(inp):
   for c in inp:
     output+=base64Map[c]
   return output
-
-
-# links = [
-#   "https://www.facebook.com/groups/866004163507738/permalink/900007110107443/?comment_id=900025450105609&notif_t=group_comment_reply",
-#   "http://sixrevisions.com/css/css-specificity/",
-#   "https://docs.google.com/document/d/1yMc8cCV7u5oALDcE-mUXHZbMT0B-_J8EcYdo6KNrJqk/edit",
-#   "http://stackoverflow.com/questions/7160737/python-how-to-validate-a-url-in-python-malformed-or-not",
-#   "https://pythonhosted.org/passlib/lib/passlib.hash.mysql323.html",
-#   "https://docs.python.org/2/library/hashlib.html#module-hashlib",
-#   "http://stackoverflow.com/questions/18815820/convert-string-to-binary-in-python",
-#   "https://www.google.com/search?q=256%2F6&oq=256%2F6&aqs=chrome..69i57j69i64j0l2.1579j0j7&sourceid=chrome&es_sm=91&ie=UTF-8",
-#   "http://regexr.com/",
-#   "https://www.google.com/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=string%20to%20binary%20python",
-#   "http://puu.sh/maXeS/f4e077d94b.pdf",
-#   "http://stackoverflow.com/questions/1403674/pythonic-way-to-return-list-of-every-nth-item-in-a-larger-list"  
-
-# ]
-
