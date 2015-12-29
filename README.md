@@ -10,9 +10,13 @@ Has basic functionality such as:
 * Perhaps add a login system so people can keep track of their own url's
 * Make a way so people can view how many hits each url has
 
+###License
+GNU GPL. Please no stealerino kthx
 
 ###Credit
 Logo: meiikyuu
+
 Webpage design: Gensuihime
+
 Everything else: Remi_Scarlet
 
