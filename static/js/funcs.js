@@ -23,7 +23,9 @@ $(document).ready(function () {
   $("#urlForm").submit(function() {
       var url;
       var csrf = $("[name='csrfmiddlewaretoken']").val();
-      $.post("/api/", {csrfmiddlewaretoken:csrf,url:$("#url").val()})
+      var custom = $("#customURL").val();
+      console.log(custom);
+      $.post("/api/", {csrfmiddlewaretoken:csrf,url:$("#url").val(),customURL:custom})
       .done(function (data){
         generateLink(data);
       });
