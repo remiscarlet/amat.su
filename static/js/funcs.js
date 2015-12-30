@@ -3,6 +3,7 @@ function generateLink(shortURL){
   var urlBox = $("#output");
   console.log(urlBox);
   console.log(shortURL);
+
   urlBox.val(shortURL);
 }
 
@@ -27,6 +28,12 @@ $(document).ready(function () {
       console.log(custom);
       $.post("/api/", {csrfmiddlewaretoken:csrf,url:$("#url").val(),customURL:custom})
       .done(function (data){
+
+        var addKaze = $('#addKaze').is(":checked");
+        if (addKaze){
+          var split = data.split("/")
+          data = "http://amat.su/kaze/"+split[3];
+        }
         generateLink(data);
       });
       return false;
