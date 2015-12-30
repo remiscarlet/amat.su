@@ -15,6 +15,7 @@ def index(request):
   template = django.template.loader.get_template("index.html")
   randomizedForm = hashlib.md5(str(time.time())).hexdigest()
   context = RequestContext(request, {"randomizedID":randomizedForm})
+  #context = Context({"randomizedID":randomizedForm})
   html = template.render(context)
   return HttpResponse(html)
 

@@ -9,7 +9,7 @@
 			opacity:0.8;
 			
 		}
-		.intake, .outtake {
+		.intake, .outtake, .custom {
 			width:512px;
 			margin-left:auto;
 			margin-right:auto;
@@ -24,6 +24,14 @@
 			margin-top:3px;
 			margin-left:3px;
 			width:436px;
+			border:1px solid #999;
+			border-radius:4px;
+			height:20px;
+		}
+		input#customURL{
+			margin-top:3px;
+			margin-left:3px;
+			width:200;
 			border:1px solid #999;
 			border-radius:4px;
 			height:20px;
