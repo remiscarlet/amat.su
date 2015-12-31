@@ -18,5 +18,7 @@ Logo: meiikyuu
 
 Webpage design: Gensuihime
 
-Everything else: Remi_Scarlet
+Webserver: Patches, Fauxm
+
+Code and everything else: Remi_Scarlet
 

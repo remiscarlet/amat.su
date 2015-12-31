@@ -90,13 +90,11 @@ def api(request):
       return HttpResponse(returnUrl, content_type="text/plain")
 
 
-    check = models.Url.objects.filter(fullUrl=url)
-    if len(check) >0:
-      returnUrl = check[0].shortenedUrl
-      print "already exists",returnUrl
-      return HttpResponse(returnUrl, content_type="text/plain")
-
-
+    # check = models.Url.objects.filter(fullUrl=url)
+    # if len(check) >0:
+    #   returnUrl = check[0].shortenedUrl
+    #   print "already exists",returnUrl
+    #   return HttpResponse(returnUrl, content_type="text/plain")
 
     hashed = url
     collission = True
