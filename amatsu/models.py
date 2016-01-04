@@ -5,3 +5,5 @@ class Url(models.Model):
   hashOfUrl = models.CharField(max_length=6)
   shortenedUrl = models.CharField(max_length=32)
   hits = models.IntegerField()
+  isCustom = models.BooleanField(default=False)
+

@@ -40,6 +40,7 @@ def redirect(request,hashed=None):
     return django.shortcuts.redirect(HOST_URL+"/kaze/")
 
 def api(request):
+  print request
 
   if ("url" not in request.POST or
       "csrfmiddlewaretoken" not in request.POST or
@@ -85,16 +86,20 @@ def api(request):
 
       # Else, we're good.
       returnUrl = HOST_URL+customURL
-      urlObj = models.Url(fullUrl=url,hashOfUrl=customURL,shortenedUrl=returnUrl,hits=0)
+      urlObj = models.Url(fullUrl=url,hashOfUrl=customURL,shortenedUrl=returnUrl,hits=0,isCustom=True)
       urlObj.save()
       return HttpResponse(returnUrl, content_type="text/plain")
 
 
-    # check = models.Url.objects.filter(fullUrl=url)
-    # if len(check) >0:
-    #   returnUrl = check[0].shortenedUrl
-    #   print "already exists",returnUrl
-    #   return HttpResponse(returnUrl, content_type="text/plain")
+    check = models.Url.objects.filter(fullUrl=url)
+    if len(check) >0:
+      for url in check:
+        if url.isCustom == False:
+          returnUrl = check[0].shortenedUrl
+          print "already exists",returnUrl
+          return HttpResponse(returnUrl, content_type="text/plain")
+
+
 
     hashed = url
     collission = True
