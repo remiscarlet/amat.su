@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 import hashlib, time
 from amatsu import models
 import requests
+import datetime
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 import hasher
@@ -42,11 +43,28 @@ def redirect(request,hashed=None):
 def api(request):
   print request
 
+
+
   if ("url" not in request.POST or
       "csrfmiddlewaretoken" not in request.POST or
       "customURL" not in request.POST):
     print request.POST
     raise Http404
+
+  # Need client IP for flood prevention so need this header.
+  # It's a required header to be standard-compliant.
+  if "REMOTE_ADDR" not in request.META:
+    return HttpResponse("Oops, seems like you're using a non-standard compliant browser!")
+
+  print "asdf"
+  ips = models.IP.objects.filter(ip=request.META["REMOTE_ADDR"])
+  print "aaaaa"
+  if len(ips) > 0:
+    print "aaaa"
+    print ips[0].lastUsed
+    print ips[0].ip
+  print "Fdsa"
+
 
   url = request.POST["url"]
   customURL = request.POST["customURL"]
@@ -75,7 +93,6 @@ def api(request):
       # Check if customURL is already in use or not
       existingCheck = models.Url.objects.filter(hashOfUrl=customURL)
       if len(existingCheck) > 0:
-
         # Check if that full url already exists, eg the exact same parameters
         if existingCheck[0].fullUrl == url:
           # Already existed with exact same shortening so might as well return it
@@ -86,8 +103,20 @@ def api(request):
 
       # Else, we're good.
       returnUrl = HOST_URL+customURL
+
+      # Store IP to prevent floods
+      if len(ips)==0:
+        ipObj = models.IP(ip=request.META["REMOTE_ADDR"])
+      else:
+        ipObj = ips[0]
+        print "test"
+        ipObj.lastUsed = datetime.datetime.now()
+        print "newtime", ipObj.lastUsed
+      ipObj.save()
+
       urlObj = models.Url(fullUrl=url,hashOfUrl=customURL,shortenedUrl=returnUrl,hits=0,isCustom=True)
       urlObj.save()
+
       return HttpResponse(returnUrl, content_type="text/plain")
 
 
@@ -109,8 +138,18 @@ def api(request):
       if len(models.Url.objects.filter(hashOfUrl=hashed)) == 0:
         collission = False
     returnUrl = HOST_URL+hashed
+
     urlObj = models.Url(fullUrl=url,hashOfUrl=hashed,shortenedUrl=returnUrl,hits=0)
     urlObj.save()
+    if len(ips)==0:
+      ipObj = models.IP(ip=request.META["REMOTE_ADDR"])
+    else:
+      ipObj = ips[0]
+      print "test"
+      ipObj.lastUsed = datetime.datetime.now()
+      print "newtime", ipObj.lastUsed
+
+    ipObj.save()
 
     return HttpResponse(returnUrl, content_type="text/plain")
   except ValidationError, e:
