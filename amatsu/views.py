@@ -11,6 +11,7 @@ from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 import hasher
 import re
+import pytz
 
 # For easier switching between test and production servers
 HOST_URL = "http://amat.su/"
@@ -40,10 +41,16 @@ def redirect(request,hashed=None):
   else:
     return django.shortcuts.redirect(HOST_URL+"/kaze/")
 
+# Helper function for api() to calculate time differences
+def formatTime(inp):
+  inp = str(inp)
+  if inp.find("+")>-1:
+    time = inp[:inp.find("+")]
+  return datetime.datetime.strptime(time,"%Y-%m-%d %H:%M:%S.%f")
+
+
 def api(request):
   print request
-
-
 
   if ("url" not in request.POST or
       "csrfmiddlewaretoken" not in request.POST or
@@ -109,9 +116,14 @@ def api(request):
         ipObj = models.IP(ip=request.META["REMOTE_ADDR"])
       else:
         ipObj = ips[0]
-        print "test"
-        ipObj.lastUsed = datetime.datetime.now()
-        print "newtime", ipObj.lastUsed
+        # 2016-01-12 16:22:22.129932+00:00
+        now = datetime.datetime.now(tz=pytz.utc)
+        # If requests are too quick
+        if (formatTime(now)-formatTime(ipObj.lastUsed))<=datetime.timedelta(milliseconds=1000):
+          return HttpResponse("Slow down! You're making too many requests!",content_type="text/plain")
+        ipObj.lastUsed = now
+
+
       ipObj.save()
 
       urlObj = models.Url(fullUrl=url,hashOfUrl=customURL,shortenedUrl=returnUrl,hits=0,isCustom=True)
@@ -145,10 +157,14 @@ def api(request):
       ipObj = models.IP(ip=request.META["REMOTE_ADDR"])
     else:
       ipObj = ips[0]
-      print "test"
-      ipObj.lastUsed = datetime.datetime.now()
-      print "newtime", ipObj.lastUsed
+      # 2016-01-12 16:22:22.129932+00:00
+      now = datetime.datetime.now(tz=pytz.utc)
+      # If requests are too quick
+      if (formatTime(now)-formatTime(ipObj.lastUsed))<=datetime.timedelta(milliseconds=1000):
+        return HttpResponse("Slow down! You're making too many requests!",content_type="text/plain")
+      ipObj.lastUsed = now
 
+    
     ipObj.save()
 
     return HttpResponse(returnUrl, content_type="text/plain")
