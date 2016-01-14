@@ -49,12 +49,14 @@ def formatTime(inp):
   return datetime.datetime.strptime(time,"%Y-%m-%d %H:%M:%S.%f")
 
 
+@csrf_exempt
 def api(request):
   print request
 
   if ("url" not in request.POST or
-      "csrfmiddlewaretoken" not in request.POST or
-      "customURL" not in request.POST):
+      "customURL" not in request.POST or
+      ("csrfmiddlewaretoken" not in request.POST and
+       "isFromExtension" not in request.POST)):
     print request.POST
     raise Http404
 
@@ -62,6 +64,10 @@ def api(request):
   # It's a required header to be standard-compliant.
   if "REMOTE_ADDR" not in request.META:
     return HttpResponse("Oops, seems like you're using a non-standard compliant browser!")
+
+  isFromExtension = False
+  if "isFromExtension" in request.POST:
+    isFromExtension = True
 
   print "asdf"
   ips = models.IP.objects.filter(ip=request.META["REMOTE_ADDR"])
@@ -126,7 +132,11 @@ def api(request):
 
       ipObj.save()
 
-      urlObj = models.Url(fullUrl=url,hashOfUrl=customURL,shortenedUrl=returnUrl,hits=0,isCustom=True)
+      urlObj = models.Url(fullUrl=url,
+                          hashOfUrl=customURL,
+                          shortenedUrl=returnUrl,
+                          hits=0,isCustom=True,
+                          madeByExtension=isFromExtension)
       urlObj.save()
 
       return HttpResponse(returnUrl, content_type="text/plain")
@@ -151,7 +161,12 @@ def api(request):
         collission = False
     returnUrl = HOST_URL+hashed
 
-    urlObj = models.Url(fullUrl=url,hashOfUrl=hashed,shortenedUrl=returnUrl,hits=0)
+
+    urlObj = models.Url(fullUrl=url,
+                        hashOfUrl=customURL,
+                        shortenedUrl=returnUrl,
+                        hits=0,isCustom=True,
+                        madeByExtension=isFromExtension)
     urlObj.save()
     if len(ips)==0:
       ipObj = models.IP(ip=request.META["REMOTE_ADDR"])
@@ -164,7 +179,7 @@ def api(request):
         return HttpResponse("Slow down! You're making too many requests!",content_type="text/plain")
       ipObj.lastUsed = now
 
-    
+
     ipObj.save()
 
     return HttpResponse(returnUrl, content_type="text/plain")
