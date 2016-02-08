@@ -52,6 +52,7 @@ def formatTime(inp):
 @csrf_exempt
 def api(request):
   print request
+  print "a", request.is_ajax()
 
   if ("url" not in request.POST or
       "customURL" not in request.POST or
@@ -59,6 +60,7 @@ def api(request):
        "isFromExtension" not in request.POST)):
     print request.POST
     raise Http404
+  print "a"
 
   # Need client IP for flood prevention so need this header.
   # It's a required header to be standard-compliant.
@@ -69,17 +71,10 @@ def api(request):
   if "isFromExtension" in request.POST:
     isFromExtension = True
 
-  print "asdf"
   ips = models.IP.objects.filter(ip=request.META["REMOTE_ADDR"])
-  print "aaaaa"
-  if len(ips) > 0:
-    print "aaaa"
-    print ips[0].lastUsed
-    print ips[0].ip
-  print "Fdsa"
+  print request.POST
 
-
-  url = request.POST["url"]
+  url = str(request.POST["url"])
   customURL = request.POST["customURL"]
 
   # If we have a custom URL, then validate it.
@@ -141,7 +136,6 @@ def api(request):
 
       return HttpResponse(returnUrl, content_type="text/plain")
 
-
     check = models.Url.objects.filter(fullUrl=url)
     if len(check) >0:
       for url in check:
@@ -151,8 +145,7 @@ def api(request):
           return HttpResponse(returnUrl, content_type="text/plain")
 
 
-
-    hashed = url
+    hashed = str(url)
     collission = True
     while collission:
       hashed = hasher.returnShortenedURL(hashed)
@@ -160,7 +153,6 @@ def api(request):
       if len(models.Url.objects.filter(hashOfUrl=hashed)) == 0:
         collission = False
     returnUrl = HOST_URL+hashed
-
 
     urlObj = models.Url(fullUrl=url,
                         hashOfUrl=customURL,
@@ -171,6 +163,7 @@ def api(request):
     if len(ips)==0:
       ipObj = models.IP(ip=request.META["REMOTE_ADDR"])
     else:
+      print "f"
       ipObj = ips[0]
       # 2016-01-12 16:22:22.129932+00:00
       now = datetime.datetime.now(tz=pytz.utc)

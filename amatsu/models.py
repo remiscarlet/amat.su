@@ -12,3 +12,4 @@ class Url(models.Model):
 class IP(models.Model):
   ip = models.CharField(max_length=15)
   lastUsed = models.DateTimeField(default=datetime.datetime.now)
+
