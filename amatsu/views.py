@@ -27,11 +27,9 @@ def toHomepage(request):
   return django.shortcuts.redirect("/kaze/")
 
 def redirect(request,hashed=None):
-  print "hashed =",hashed
   if hashed == None:
     return django.shortcuts.redirect("/kaze/")
 
-  print hashed
   check = models.Url.objects.filter(hashOfUrl=hashed)
   if len(check) >0:
     destUrl = check[0].fullUrl
@@ -51,8 +49,6 @@ def formatTime(inp):
 
 @csrf_exempt
 def api(request):
-  print request
-  print "a", request.is_ajax()
 
   if ("url" not in request.POST or
       "customURL" not in request.POST or
@@ -60,22 +56,17 @@ def api(request):
        "isFromExtension" not in request.POST)):
     print request.POST
     raise Http404
-  print "a"
 
   # Need client IP for flood prevention so need this header.
   # It's a required header to be standard-compliant.
   if "REMOTE_ADDR" not in request.META:
     return HttpResponse("Oops, seems like you're using a non-standard compliant browser!")
 
-  isFromExtension = False
-  if "isFromExtension" in request.POST:
-    isFromExtension = True
+  isFromExtension = "isFromExtension" in request.POST:
 
   ips = models.IP.objects.filter(ip=request.META["REMOTE_ADDR"])
-  print request.POST
 
   url = str(request.POST["url"])
-  print "url", url
   customURL = request.POST["customURL"]
 
   # If we have a custom URL, then validate it.
@@ -86,17 +77,14 @@ def api(request):
     # If not valid, return error message.
     if results != None:
       return HttpResponse("Custom URLs can only contain alphanumeric symbols, - and _", content_type="text/plain")
-    if len(customURL) <4 or len(customURL) > 32:
+    if len(customURL) < 4 or len(customURL) > 32:
       return HttpResponse("Custom URLs must be between 4 and 32 characters long!", content_type="text/plain")
 
 
-  print "a"
   validator = URLValidator()
   try:
-    # Validate url
-    print "url", url
+    # Validate url to make sure it's valid
     validator(url)
-    print "url2", url
 
     # First check if we have a custom url. 
     # If so, we override the preexisting checks.
@@ -120,7 +108,7 @@ def api(request):
         ipObj = models.IP(ip=request.META["REMOTE_ADDR"])
       else:
         ipObj = ips[0]
-        # 2016-01-12 16:22:22.129932+00:00
+        # eg, 2016-01-12 16:22:22.129932+00:00
         now = datetime.datetime.now(tz=pytz.utc)
         # If requests are too quick
         if (formatTime(now)-formatTime(ipObj.lastUsed))<=datetime.timedelta(milliseconds=1000):
@@ -133,51 +121,43 @@ def api(request):
       urlObj = models.Url(fullUrl=url,
                           hashOfUrl=customURL,
                           shortenedUrl=returnUrl,
-                          hits=0,isCustom=True,
+                          hits=0, isCustom=True,
                           madeByExtension=isFromExtension)
       urlObj.save()
 
       return HttpResponse(returnUrl, content_type="text/plain")
-    print "b"
+
     check = models.Url.objects.filter(fullUrl=url)
     if len(check) >0:
       for url in check:
         if url.isCustom == False:
           returnUrl = check[0].shortenedUrl
-          print "already exists",returnUrl
           return HttpResponse(returnUrl, content_type="text/plain")
 
-    print  "aaaaaa", repr(url)
     hashed = str(url)
     collission = True
+
     while collission:
       hashed = hasher.returnShortenedURL(hashed)
-      print "hashing"
       if len(models.Url.objects.filter(hashOfUrl=hashed)) == 0:
         collission = False
+
     returnUrl = HOST_URL+hashed
-    print "done hashing"
-    print repr(url);
-    print str(url), hashed, returnUrl, isFromExtension
     urlObj = models.Url(fullUrl=str(url),
                         hashOfUrl=hashed,
                         shortenedUrl=returnUrl,
                         hits=0,isCustom=False,
                         madeByExtension=isFromExtension)
-    print "a"
-    print urlObj
     try:
       urlObj.save()
     except:
-      print "AAAAAAAA"
       return HttpResponse("Oops something broke! Try again in a bit!", content_type="text/plain")
-    print "asdf"
+
     if len(ips)==0:
       ipObj = models.IP(ip=request.META["REMOTE_ADDR"])
     else:
-      print "f"
       ipObj = ips[0]
-      # 2016-01-12 16:22:22.129932+00:00
+      # eg, 2016-01-12 16:22:22.129932+00:00
       now = datetime.datetime.now(tz=pytz.utc)
       # If requests are too quick
       if (formatTime(now)-formatTime(ipObj.lastUsed))<=datetime.timedelta(milliseconds=1000):
