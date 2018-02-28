@@ -6,18 +6,22 @@ Has basic functionality such as:
 * Storing number of hits on each hash (Still not viewable, on todo list)
 * A copy button to copy shortened URL to clipboard
 
-###Browser Extensions
+### 2018 Edit
+This project is 100% certified L O L D E A D
+I'm willing to take PR's if anyone gives an astronomical amount of fucks to go through the effort of making one.
+
+### Browser Extensions
 Check out this repo for Chrome and Firefox extensions for amat.su! 
 https://github.com/remiscarlet/amat.su-browser-extensions
 
-###Todo
+### Todo
 * Perhaps add a login system so people can keep track of their own url's
 * Make a way so people can view how many hits each url has
 
-###License
+### License
 GNU GPL. Please no stealerino kthx
 
-###Credit
+### Credit
 Logo: meiikyuu
 
 Webpage design: Gensuihime
