@@ -14,3 +14,16 @@ resource "google_sql_database_instance" "amatsu" {
 
   deletion_protection = "true"
 }
+
+resource "google_sql_user" "amatsu-admin" {
+  name     = var.db_master_user
+  password = var.db_master_pass
+  instance = google_sql_database_instance.amatsu.name
+}
+
+resource "mysql_grant" "aquabot" {
+  user       = google_sql_user.amatsu-admin.name
+  host       = google_sql_user.amatsu-admin.host
+  privileges = ["ALL"]
+  database   = google_sql_database.database.name
+}
