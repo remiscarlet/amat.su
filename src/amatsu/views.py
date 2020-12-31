@@ -1,26 +1,29 @@
+import django
+from django.views.decorators.csrf import csrf_exempt
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 from django.http import HttpResponse, Http404
 from django.template import Template, Context, RequestContext
 from django.shortcuts import render
-import django
-from django.views.decorators.csrf import csrf_exempt
-import hashlib, time
-from amatsu import models
+
+import re
+import time
+import pytz
+import hashlib
 import requests
 import datetime
-from django.core.validators import URLValidator
-from django.core.exceptions import ValidationError
-import hasher
-import re
-import pytz
+
+from amatsu import models, hasher
 
 # For easier switching between test and production servers
 HOST_URL = "http://amat.su/"
 
 def index(request):
   template = django.template.loader.get_template("index.html")
-  randomizedForm = hashlib.md5(str(time.time())).hexdigest()
-  context = RequestContext(request, {"randomizedID":randomizedForm})
-  html = template.render(context)
+  randomizedForm = hashlib.md5(str(time.time()).encode()).hexdigest()
+  #context = RequestContext(request, {"randomizedID":randomizedForm})
+  context = {"randomizedID":randomizedForm}
+  html = template.render(context, request=request)
   return HttpResponse(html)
 
 def toHomepage(request):
@@ -54,7 +57,6 @@ def api(request):
       "customURL" not in request.POST or
       ("csrfmiddlewaretoken" not in request.POST and
        "isFromExtension" not in request.POST)):
-    print request.POST
     raise Http404
 
   # Need client IP for flood prevention so need this header.
@@ -62,7 +64,7 @@ def api(request):
   if "REMOTE_ADDR" not in request.META:
     return HttpResponse("Oops, seems like you're using a non-standard compliant browser!")
 
-  isFromExtension = "isFromExtension" in request.POST:
+  isFromExtension = "isFromExtension" in request.POST
 
   ips = models.IP.objects.filter(ip=request.META["REMOTE_ADDR"])
 
@@ -168,8 +170,8 @@ def api(request):
     ipObj.save()
 
     return HttpResponse(returnUrl, content_type="text/plain")
-  except ValidationError, e:
+  except ValidationError as e:
 
-    print e
+    print(e)
     return HttpResponse("Please enter a valid and full url!", content_type="text/plain")
 

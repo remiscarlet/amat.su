@@ -1,6 +1,6 @@
 import hashlib
 
-base64Map = {
+base64_map_tmp = {
   "000000":"a", "011010":"A", "110100":"0",
   "000001":"b", "011011":"B", "110101":"1",
   "000010":"c", "011100":"C", "110110":"2",
@@ -28,9 +28,11 @@ base64Map = {
   "011000":"y", "110010":"Y",
   "011001":"z", "110011":"Z",
 }
+base64_map = {}
 
-for k,v in base64Map.items():
-  base64Map[v] = k
+for k,v in base64_map_tmp.items():
+  base64_map[k] = v
+  base64_map[v] = k
 
 
 def returnHash(inp):
@@ -46,7 +48,7 @@ def base64(inp):
   output = ""
   for i in xrange(6):
     bitstring = inp[i*6:(i+1)*6]
-    output+=base64Map[bitstring]
+    output+=base64_map[bitstring]
   return output
 
 def returnShortenedURL(inp):
@@ -57,5 +59,5 @@ def returnShortenedURL(inp):
 def decodeBase64(inp):
   output = ""
   for c in inp:
-    output+=base64Map[c]
+    output+=base64_map[c]
   return output
