@@ -1,4 +1,4 @@
 variable "project_id" {}
 variable "project_name" {}
-variable "region" {}
-variable "region_zone" {}
+variable "project_region" {}
+variable "project_zone" {}
