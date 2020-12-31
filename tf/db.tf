@@ -1,6 +1,6 @@
 resource "google_sql_database" "database" {
   name     = "amatsu-db"
-  instance = google_sql_database_instance.instance.name
+  instance = google_sql_database_instance.amatsu.name
 }
 
 resource "google_sql_database_instance" "amatsu" {
