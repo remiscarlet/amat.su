@@ -36,7 +36,7 @@ for k,v in base64_map_tmp.items():
 
 
 def returnHash(inp):
-  inp = hashlib.md5(inp).hexdigest()
+  inp = hashlib.md5(inp.encode()).hexdigest()
   return (''.join('{0:08b}'.format(ord(x), 'b') for x in inp))
 
 def shorten(inp):
@@ -46,7 +46,7 @@ def shorten(inp):
 
 def base64(inp):
   output = ""
-  for i in xrange(6):
+  for i in range(6):
     bitstring = inp[i*6:(i+1)*6]
     output+=base64_map[bitstring]
   return output

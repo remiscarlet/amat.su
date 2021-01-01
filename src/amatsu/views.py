@@ -34,7 +34,7 @@ def redirect(request,hashed=None):
     return django.shortcuts.redirect("/kaze/")
 
   check = models.Url.objects.filter(hashOfUrl=hashed)
-  if len(check) >0:
+  if len(check) > 0:
     destUrl = check[0].fullUrl
     check[0].hits += 1
     check[0].save()
@@ -47,7 +47,11 @@ def formatTime(inp):
   inp = str(inp)
   if inp.find("+")>-1:
     time = inp[:inp.find("+")]
-  return datetime.datetime.strptime(time,"%Y-%m-%d %H:%M:%S.%f")
+  try:
+    return datetime.datetime.strptime(time,"%Y-%m-%d %H:%M:%S.%f")
+  except:
+    # Yikes. Py2 vs py3 datetime default behavior differences.
+    return datetime.datetime.strptime(time,"%Y-%m-%d %H:%M:%S")
 
 
 @csrf_exempt
@@ -98,7 +102,7 @@ def api(request):
         if existingCheck[0].fullUrl == url:
           # Already existed with exact same shortening so might as well return it
           return HttpResponse(existingCheck[0].shortenedUrl, content_type="text/plain")
-        
+
         # Otherwise we have a conflicting customURL to different redirects
         return HttpResponse("That custom URL is already in use!", content_type="text/plain")
 

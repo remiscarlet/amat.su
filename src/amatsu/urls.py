@@ -9,8 +9,8 @@ urlpatterns = [
     # url(r'^blog/', include('blog.urls')),
     url(r'^api[/]$', views.api),
     url(r'^kaze[/]?$', views.index),
-    url(r'^kaze/(?P<hashed>[a-zA-Z0-9\_\-]{4,32})[/]{0,1}$', views.redirect),
-    url(r'^(?P<hashed>[a-zA-Z0-9\_\-]{4,32})[/]{0,1}$',views.redirect),
+    url(r'^kaze/(?P<hashed>[a-zA-Z0-9\_\-]{4,32})/?$', views.redirect),
+    url(r'^(?P<hashed>[a-zA-Z0-9\_\-]{4,32})/?$',views.redirect),
     url(r'^$', views.toHomepage),
     url(r'.*', views.redirect),
 ]
