@@ -15,6 +15,7 @@ resource "google_project_service" "enabled-apis" {
 
   # http://amat.su/Rb8gSP
   for_each = toset([
+    "artifactregistry.googleapis.com",
     "iam.googleapis.com",
     "sqladmin.googleapis.com",
     "compute.googleapis.com",
