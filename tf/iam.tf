@@ -15,11 +15,11 @@ resource "google_service_account" "gcr_uploader" {
 #  member     = "serviceAccount:${google_service_account.gcr_uploader.email}"
 #}
 
-#resource "google_storage_bucket_iam_binding" "gcr-docker-image-access" {
-#  bucket = "artifacts.${var.project_id}.appspot.com"
-#  role   = "roles/storage.objectCreator"
-#
-#  members = [
-#    "serviceAccount:${google_service_account.gcr_uploader.email}"
-#  ]
-#}
+resource "google_storage_bucket_iam_binding" "gcr-docker-image-access" {
+  bucket = "artifacts.${var.project_id}.appspot.com"
+  role   = "roles/storage.objectCreator"
+
+  members = [
+    "serviceAccount:${google_service_account.gcr_uploader.email}"
+  ]
+}
