@@ -18,15 +18,15 @@ jobs:
     steps:
       - name: Clone repo
         uses: actions/checkout@v2
-			- name: Clone submodule
-				uses: actions/checkout@v2
-				with:
-					repository: remiscarlet/amat.su-secrets
-					path: src/amatsu/secrets
-					ssh-key: ${{ secrets.SSH_KEY }}
-					persist-credentials: true
-			- name: Checkout submodule
-				run: |
-					git submodule init
-					git submodule update
+      - name: Clone submodule
+        uses: actions/checkout@v2
+        with:
+          repository: remiscarlet/amat.su-secrets
+          path: src/amatsu/secrets
+          ssh-key: ${{ secrets.SSH_KEY }}
+          persist-credentials: true
+      - name: Checkout submodule
+        run: |
+          git submodule init
+          git submodule update
 
