@@ -37,7 +37,7 @@ jobs:
         name: Build and push
         uses: mr-smithers-excellent/docker-build-push@v5
         with:
-          image: amat.su/amatsu
+          image: amatsu/amatsu
           registry: gcr.io
           username: _json_key
           password: ${{ secrets.CR_PAT }}
