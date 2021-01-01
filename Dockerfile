@@ -1,12 +1,18 @@
 FROM python:3
 ENV PYTHONUNBUFFERED 1
-RUN mkdir /code
-WORKDIR /code
-COPY requirements.txt /code/
+
+# Amat.su
+RUN mkdir /app
+WORKDIR /app
+COPY requirements.txt /app/
 RUN pip install -r requirements.txt
-COPY src /code/
+COPY src /app/
 
-RUN ls /code/
-RUN ls /code/amatsu/
+RUN python manage.py collectstatic --noinput
 
-ENTRYPOINT ["/code/entrypoint.sh"]
+RUN ls /
+RUN ls /app/
+RUN ls /app/amatsu/
+
+ENTRYPOINT ["/app/entrypoint.sh"]
+
