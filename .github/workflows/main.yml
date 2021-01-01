@@ -18,10 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       -
-				name: Clone repo
+        name: Clone repo
         uses: actions/checkout@v2
       -
-				name: Clone submodule
+        name: Clone submodule
         uses: actions/checkout@v2
         with:
           repository: remiscarlet/amat.su-secrets
@@ -29,7 +29,7 @@ jobs:
           ssh-key: ${{ secrets.SSH_KEY }}
           persist-credentials: true
       -
-				name: Checkout submodule
+        name: Checkout submodule
         run: |
           git submodule init
           git submodule update
@@ -46,7 +46,7 @@ jobs:
           registry: us-central1-docker.pkg.dev
           username: _json_key
           password: ${{ secrets.CR_PAT }}
-			-
+      -
         name: Build and push
         uses: docker/build-push-action@v2
         with:
