@@ -8,7 +8,7 @@ resource "google_service_account" "gcr_uploader" {
 
 resource "google_storage_bucket_iam_binding" "gcr-docker-image-access" {
   bucket = "artifacts.${var.project_id}.appspot.com"
-  role   = "roles/storage.objectAdmin"
+  role   = "roles/storage.legacyBucketWriter"
 
   members = [
     "serviceAccount:${google_service_account.gcr_uploader.email}"
