@@ -20,6 +20,6 @@ resource "google_storage_bucket_iam_binding" "gcr-docker-image-access" {
   role   = "roles/storage.objectCreator"
 
   members = [
-    "serviceAccount:${google_service_account.yc-infra-bot.email}"
+    "serviceAccount:${google_service_account.gcr_uploader.email}"
   ]
 }
