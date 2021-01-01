@@ -9,7 +9,7 @@ data "template_file" "docker-compose" {
 }
 
 data "template_file" "amatsu-daemon" {
-  template = file("templates/amatsu-daemon.yml.tpl")
+  template = file("templates/amatsu-daemon.tpl")
 
   vars = {
     gcr_project = var.project_id
