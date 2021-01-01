@@ -4,6 +4,12 @@ provider "google" {
   credentials = var.gcp_token
 }
 
+provider "google-beta" {
+  project     = var.project_id
+  region      = var.project_region
+  credentials = var.gcp_token
+}
+
 resource "google_project_service" "enabled-apis" {
   project = data.google_project.project.project_id
 
