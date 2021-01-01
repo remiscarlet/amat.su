@@ -6,7 +6,7 @@ COPY requirements.txt /code/
 RUN pip install -r requirements.txt
 COPY src /code/
 
-RUN ls /code/OA_web/
-RUN ls /code/OA_web/config
+RUN ls /code/
+RUN ls /code/amatsu/
 
 ENTRYPOINT ["/code/entrypoint.sh"]
