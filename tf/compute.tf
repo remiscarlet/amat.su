@@ -23,7 +23,7 @@ data "template_file" "cloud-init-prod" {
 
   vars = {
     docker_compose_content = data.template_file.docker-compose.rendered
-    amatsu_daemon_content  = data.template_file.amatsu_daemon.rendered
+    amatsu_daemon_content  = data.template_file.amatsu-daemon.rendered
   }
 }
 
