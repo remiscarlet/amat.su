@@ -6,6 +6,10 @@ Has basic functionality such as:
 * Storing number of hits on each hash (Still not viewable, on todo list)
 * A copy button to copy shortened URL to clipboard
 
+### 2020 Edit
+I've done something vaguely resembling CI with GHA and terraform so I can finally migrate this off some random server a friend hosts.
+Fuck you, Docker.
+
 ### 2018 Edit
 This project is 100% certified L O L D E A D
 I'm willing to take PR's if anyone gives an astronomical amount of fucks to go through the effort of making one.
