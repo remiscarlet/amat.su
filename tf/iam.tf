@@ -2,7 +2,7 @@
 
 
 resource "google_service_account" "gcr_uploader" {
-  account_id   = "amatsu_gcr_uploader"
+  account_id   = "amatsu-gcr-uploader"
   display_name = "Amatsu GCR Uploader"
 }
 
