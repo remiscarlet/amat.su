@@ -1,0 +1,3 @@
+[submodule "src/amatsu/secrets"]
+	path = src/amatsu/secrets
+	url = git@github.com:remiscarlet/amat.su-secrets.git
