@@ -2,9 +2,10 @@ data "template_file" "docker-compose" {
   template = file("templates/docker-compose.yml.tpl")
 
   vars = {
-    gcr_project = var.project_id
-    gcr_image   = var.amatsu_image_name
-    gcr_tag     = var.amatsu_image_tag
+    gcr_project       = var.project_id
+    gcr_image         = var.amatsu_image_name
+    gcr_secrets_image = var.amatsu_secrets_image_name
+    gcr_tag           = var.amatsu_image_tag
   }
 }
 

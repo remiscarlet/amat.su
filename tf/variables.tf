@@ -8,6 +8,7 @@ variable "db_master_user" {}
 variable "db_master_pass" {}
 
 variable "amatsu_image_name" {}
+variable "amatsu_secrets_image_name" {}
 variable "amatsu_image_tag" {}
 
 variable "gce_ssh_user" {}
