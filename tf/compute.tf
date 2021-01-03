@@ -1,3 +1,7 @@
+data "template_file" "configure-firewall" {
+  template = file("templates/configure-firewall.tpl")
+}
+
 data "template_file" "docker-compose" {
   template = file("templates/docker-compose.yml.tpl")
 
@@ -28,8 +32,9 @@ data "template_file" "cloud-init-prod" {
   template = file("templates/cloud-init.yml.tpl")
 
   vars = {
-    docker_compose_content = data.template_file.docker-compose.rendered
-    amatsu_daemon_content  = data.template_file.amatsu-daemon.rendered
+    docker_compose_content     = data.template_file.docker-compose.rendered
+    amatsu_daemon_content      = data.template_file.amatsu-daemon.rendered
+    configure_firewall_content = data.template_file.configure-firewall.rendered
   }
 }
 

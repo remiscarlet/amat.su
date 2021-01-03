@@ -1,7 +1,7 @@
 [Unit]
 Description=Runs docker-compose for Amatsu, Nginx, Letsencrypt
-Requires=docker.service network-online.target
-After=docker.service network-online.target
+Requires=docker.service network-online.target configure-firewall.service
+After=docker.service network-online.target configure-firewall.service
 
 [Service]
 User=amatsu
@@ -15,9 +15,10 @@ ExecStart=/usr/bin/docker run \
   -v "/home/amatsu/:/amatsu/" \
   -v "/home/amatsu/.docker:/root/.docker:ro" \
   -w="/home/amatsu/" \
-  docker/compose:1.24.0 up
+  docker/compose:1.27.4 up
 ExecStop=/usr/bin/docker stop amatsu
 Restart=on-failure
 RestartSec=10
+
 [Install]
 WantedBy=multi-user.target

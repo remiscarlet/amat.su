@@ -6,11 +6,11 @@ users:
   groups: docker
 
 write_files:
-- path: /home/amatsu/docker-compose.yml
-  permissions: 0755
-  owner: amatsu
+- path: /etc/systemd/system/configure-firewall.service
+  permissions: 0644
+  owner: root
   content: |
-    ${indent(4, docker_compose_content)}
+    ${indent(4, configure_firewall_content)}
 
 - path: /etc/systemd/system/amatsu-compose.service
   permissions: 0645
@@ -18,7 +18,13 @@ write_files:
   content: |
     ${indent(4, amatsu_daemon_content)}
 
+- path: /home/amatsu/docker-compose.yml
+  permissions: 0755
+  owner: amatsu
+  content: |
+    ${indent(4, docker_compose_content)}
+
+
 runcmd:
-- iptables -A INPUT -p tcp -j ACCEPT
 - systemctl daemon-reload
 - systemctl enable --now --no-block amatsu-compose.service
