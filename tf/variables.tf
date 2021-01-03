@@ -13,6 +13,7 @@ variable "amatsu_host" {}
 variable "amatsu_port" {}
 variable "amatsu_admin_email" {}
 variable "acme_ca_uri" {}
+variable "gunicorn_user" {}
 
 variable "gce_ssh_user" {}
 variable "gce_ssh_user_pub" {}

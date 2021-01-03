@@ -14,6 +14,7 @@ services:
     expose:
       - 8000
     environment:
+      - GUNICORN_USER=${env_gunicorn_user}
       - VIRTUAL_HOST=${env_amatsu_host}
       - VIRTUAL_PORT=${env_amatsu_port}
       - LETSENCRYPT_HOST=${env_amatsu_host}
