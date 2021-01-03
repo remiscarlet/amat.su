@@ -44,7 +44,7 @@ resource "google_compute_instance" "amatsu-prod" {
 
   allow_stopping_for_update = true
 
-  tags = ["http-traffic", "https-traffic", "ssh-traffic"]
+  tags = ["http-traffic", "https-traffic", "dev-traffic"]
 
   boot_disk {
     initialize_params {
