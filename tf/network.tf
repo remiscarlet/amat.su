@@ -11,6 +11,8 @@ resource "google_compute_firewall" "allow-http" {
     ports    = ["80"]
   }
 
+  source_ranges = ["0.0.0.0/0"]
+
   target_tags = ["http-traffic"]
 }
 
@@ -27,6 +29,8 @@ resource "google_compute_firewall" "allow-https" {
     ports    = ["443"]
   }
 
+  source_ranges = ["0.0.0.0/0"]
+
   target_tags = ["https-traffic"]
 }
 
@@ -42,6 +46,8 @@ resource "google_compute_firewall" "allow-dev" {
     protocol = "tcp"
     ports    = ["8000", "8001", "8123"]
   }
+
+  source_ranges = ["0.0.0.0/0"]
 
   target_tags = ["dev-traffic"]
 }
