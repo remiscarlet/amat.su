@@ -4,7 +4,6 @@ data "template_file" "docker-compose" {
   vars = {
     gcr_project            = var.project_id
     gcr_image              = var.amatsu_image_name
-    gcr_secrets_image      = var.amatsu_secrets_image_name
     gcr_tag                = var.amatsu_image_tag
     env_amatsu_host        = var.amatsu_host
     env_amatsu_port        = var.amatsu_port
