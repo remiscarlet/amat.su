@@ -1,20 +1,14 @@
-version: '2'
+version: '3'
 services:
-  amatsu-secrets:
-    container_name: amatsu-secrets
-    image: "gcr.io/${gcr_project}/${gcr_secrets_image}:${gcr_tag}"
-    volumes:
-      - /home/amatsu/secrets/:/app/secrets/
-
   amatsu:
     container_name: amatsu
     image: "gcr.io/${gcr_project}/${gcr_image}:${gcr_tag}"
     expose:
       - 8000
-    env_file:
-      - /home/amatsu/secrets/amatsu.env
-  depends-on:
-    - amatsu-secrets
+    environment:
+      - VIRTUAL_HOST=${env_amatsu_host}
+      - VIRTUAL_PORT=${env_amatsu_port}
+      - LETSENCRYPT_HOST=${env_amatsu_host}
 
   nginx-proxy:
     container_name: nginx-proxy
@@ -22,24 +16,27 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    env_file:
-      - /home/amatsu/secrets/nginx-proxy.env
+    environment:
+      - VIRTUAL_HOST=${env_amatsu_host}
+      - VIRTUAL_PORT=${env_amatsu_port}
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - certs:/etc/nginx/certs:ro
       - vhost:/etc/nginx/vhost.d
       - html:/usr/share/nginx/html
       - dhparam:/etc/nginx/dhparam
-  depends-on:
-    - amatsu
+    depends-on:
+      - amatsu
 
   letsencrypt-nginx-proxy:
     container_name: letsencrypt
     image: jrcs/letsencrypt-nginx-proxy-companion
     volumes_from:
       - nginx-proxy
-    env_file:
-      - /home/amatsu/secrets/letsencrypt-nginx-proxy.env
+    environment:
+      - DEFAULT_EMAIL=${env_amatsu_admin_email}
+      - ACME_CA_URI=${env_acme_ca_uri}
+      - NGINX_PROXY_CONTAINER=nginx-proxy
     volumes:
       - certs:/etc/nginx/certs:rw
       - /var/run/docker.sock:/var/run/docker.sock:ro
