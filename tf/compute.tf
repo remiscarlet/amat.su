@@ -54,6 +54,7 @@ resource "google_compute_instance" "amatsu-prod" {
   boot_disk {
     initialize_params {
       image = "cos-cloud/cos-stable-81-12871-103-0"
+      size  = "25"
     }
   }
 
