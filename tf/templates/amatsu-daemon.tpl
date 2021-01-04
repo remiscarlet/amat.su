@@ -11,6 +11,7 @@ ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
 ExecStartPre=/usr/bin/docker pull gcr.io/${gcr_project}/${gcr_image}:${gcr_tag}
 ExecStart=/usr/bin/docker run \
   --rm \
+  --name amatsu-compose \
   -v "/var/run/docker.sock:/var/run/docker.sock:ro" \
   -v "/home/amatsu/:/home/amatsu/" \
   -v "/home/amatsu/.docker:/root/.docker:ro" \
