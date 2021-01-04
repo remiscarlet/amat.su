@@ -7,7 +7,6 @@ volumes:
   dhparam:
   certs:
   static:
-  nginx_conf:
 
 services:
   amatsu:
@@ -21,7 +20,7 @@ services:
       - VIRTUAL_PORT=${env_amatsu_port}
       - LETSENCRYPT_HOST=${env_amatsu_host}
     volumes:
-      - nginx_conf:/app/nginx/amatsu.conf
+      - vhost:/app/nginx/vhost.d
       - static:/app/static
 
   nginx-proxy:
@@ -34,11 +33,10 @@ services:
       - VIRTUAL_HOST=${env_amatsu_host}
       - VIRTUAL_PORT=${env_amatsu_port}
     volumes:
-      - nginx_conf:/etc/nginx/conf.d/amatsu.conf:ro
       - static:/app/static:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - certs:/etc/nginx/certs:ro
-      - vhost:/etc/nginx/vhost.d
+      - vhost:/etc/nginx/vhost.d:ro
       - html:/usr/share/nginx/html
       - dhparam:/etc/nginx/dhparam
     depends_on:
