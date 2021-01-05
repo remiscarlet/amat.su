@@ -1,5 +1,5 @@
 # Dev
 location /static/ {
-  alias /app/static/;
+  alias /app/static/dev/;
   add_header Access-Control-Allow-Origin *;
 }
