@@ -49,7 +49,7 @@ jobs:
           username: _json_key
           password: ${{ secrets.CR_PAT }}
           tags: latest
-          buildArgs: IS_PRODUCTION=1
+          buildArgs: IS_PROD=1
       -
         name: Build and push Dev
         uses: mr-smithers-excellent/docker-build-push@v5
@@ -60,4 +60,4 @@ jobs:
           username: _json_key
           password: ${{ secrets.CR_PAT }}
           tags: dev
-          buildArgs: IS_PRODUCTION=0
+          buildArgs: IS_PROD=0
