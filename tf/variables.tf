@@ -8,8 +8,10 @@ variable "db_master_user" {}
 variable "db_master_pass" {}
 
 variable "amatsu_image_name" {}
-variable "amatsu_image_tag" {}
-variable "amatsu_host" {}
+variable "amatsu_prod_host" {}
+variable "amatsu_prod_image_tag" {}
+variable "amatsu_dev_host" {}
+variable "amatsu_dev_image_tag" {}
 variable "amatsu_port" {}
 variable "amatsu_admin_email" {}
 variable "acme_ca_uri" {}

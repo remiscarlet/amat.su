@@ -1,5 +1,5 @@
 [Unit]
-Description=Runs docker-compose for Amatsu, Nginx, Letsencrypt
+Description=Runs Production docker-compose for Amatsu, Nginx, Letsencrypt
 Requires=docker.service network-online.target configure-firewall.service
 After=docker.service network-online.target configure-firewall.service
 
@@ -8,7 +8,8 @@ User=amatsu
 Environment="HOME=/home/amatsu"
 WorkingDirectory=/home/amatsu
 ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
-ExecStartPre=/usr/bin/docker pull gcr.io/${gcr_project}/${gcr_image}:${gcr_tag}
+ExecStartPre=/usr/bin/docker pull gcr.io/${gcr_project}/${gcr_image}:${gcr_prod_tag}
+ExecStartPre=/usr/bin/docker pull gcr.io/${gcr_project}/${gcr_image}:${gcr_dev_tag}
 ExecStart=/usr/bin/docker run \
   --rm \
   --name amatsu-compose \

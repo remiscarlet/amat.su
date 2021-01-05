@@ -9,16 +9,30 @@ volumes:
   static:
 
 services:
-  amatsu:
-    container_name: amatsu
-    image: "gcr.io/${gcr_project}/${gcr_image}:${gcr_tag}"
+  amatsu-prod:
+    container_name: amatsu-prod
+    image: "gcr.io/${gcr_project}/${gcr_image}:${gcr_prod_tag}"
     expose:
       - 8000
     environment:
       - GUNICORN_USER=${env_gunicorn_user}
-      - VIRTUAL_HOST=${env_amatsu_host}
+      - VIRTUAL_HOST=${env_amatsu_prod_host}
       - VIRTUAL_PORT=${env_amatsu_port}
-      - LETSENCRYPT_HOST=${env_amatsu_host}
+      - LETSENCRYPT_HOST=${env_amatsu_prod_host}
+    volumes:
+      - vhost:/app/nginx/vhost.d
+      - static:/app/static
+
+  amatsu-dev:
+    container_name: amatsu-dev
+    image: "gcr.io/${gcr_project}/${gcr_image}:${gcr_dev_tag}"
+    expose:
+      - 8001
+    environment:
+      - GUNICORN_USER=${env_gunicorn_user}
+      - VIRTUAL_HOST=${env_amatsu_dev_host}
+      - VIRTUAL_PORT=${env_amatsu_port}
+      - LETSENCRYPT_HOST=${env_amatsu_dev_host}
     volumes:
       - vhost:/app/nginx/vhost.d
       - static:/app/static
@@ -29,9 +43,6 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    environment:
-      - VIRTUAL_HOST=${env_amatsu_host}
-      - VIRTUAL_PORT=${env_amatsu_port}
     volumes:
       - static:/app/static:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro
@@ -40,7 +51,8 @@ services:
       - html:/usr/share/nginx/html
       - dhparam:/etc/nginx/dhparam
     depends_on:
-      - amatsu
+      - amatsu-prod
+      - amatsu-dev
 
   letsencrypt-nginx-proxy:
     container_name: letsencrypt
