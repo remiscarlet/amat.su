@@ -24,6 +24,12 @@ write_files:
   content: |
     ${indent(4, docker_compose_content)}
 
+- path: /home/amatsu/watchtower_config.json
+  permissions: 0644
+  owner: amatsu
+  content: |
+    ${indent(4, watchtower_config_content)}
+
 
 runcmd:
 - sudo -u amatsu mkdir -p /home/amatsu/certs

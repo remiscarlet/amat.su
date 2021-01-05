@@ -1,13 +1,13 @@
 provider "google" {
   project     = var.project_id
   region      = var.project_region
-  credentials = var.gcp_token
+  credentials = var.amatsu_master_sa_json_key
 }
 
 provider "google-beta" {
   project     = var.project_id
   region      = var.project_region
-  credentials = var.gcp_token
+  credentials = var.amatsu_master_sa_json_key
 }
 
 resource "google_project_service" "enabled-apis" {

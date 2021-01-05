@@ -3,9 +3,12 @@ variable "project_name" {}
 variable "project_region" {}
 variable "project_zone" {}
 
-variable "gcp_token" {}
+variable "amatsu_master_sa_json_key" {}
+variable "amatsu_compute_sa_json_key" {}
 variable "db_master_user" {}
 variable "db_master_pass" {}
+
+variable "gcr_auth_string" {}
 
 variable "amatsu_image_name" {}
 variable "amatsu_prod_host" {}

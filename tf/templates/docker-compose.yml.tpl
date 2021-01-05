@@ -5,13 +5,19 @@ volumes:
   vhost:
   html:
   dhparam:
+  static:
   certs:
     driver: local
     driver_opts:
       type: 'none'
       o: 'bind'
       device: '/home/amatsu/certs/'
-  static:
+  watchtower_config:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/home/amatsu/watchtower_config.json'
 
 services:
   amatsu-prod:
@@ -93,5 +99,6 @@ services:
       - WATCHTOWER_LABEL_ENABLE=True
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - watchtower_config:/config.json
     depends_on:
       - letsencrypt-nginx-proxy
