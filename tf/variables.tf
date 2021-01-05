@@ -8,8 +8,6 @@ variable "amatsu_compute_sa_json_key" {}
 variable "db_master_user" {}
 variable "db_master_pass" {}
 
-variable "gcr_auth_string" {}
-
 variable "amatsu_image_name" {}
 variable "amatsu_prod_host" {}
 variable "amatsu_prod_image_tag" {}
