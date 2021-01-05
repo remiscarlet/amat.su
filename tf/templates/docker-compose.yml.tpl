@@ -18,6 +18,8 @@ services:
       - ${env_amatsu_prod_port}
     environment:
       - IS_PRODUCTION=1
+      - PYTHONUNBUFFERED=1
+      - GUNICORN_LOG_LEVEL=info
       - GUNICORN_USER=${env_gunicorn_user}
       - VIRTUAL_HOST=${env_amatsu_prod_host}
       - VIRTUAL_PORT=${env_amatsu_prod_port}
@@ -35,6 +37,8 @@ services:
       - ${env_amatsu_dev_port}
     environment:
       - IS_PRODUCTION=0
+      - PYTHONUNBUFFERED=1
+      - GUNICORN_LOG_LEVEL=debug
       - GUNICORN_USER=${env_gunicorn_user}
       - VIRTUAL_HOST=${env_amatsu_dev_host}
       - VIRTUAL_PORT=${env_amatsu_dev_port}
