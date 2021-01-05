@@ -12,6 +12,8 @@ services:
   amatsu-prod:
     container_name: amatsu-prod
     image: "gcr.io/${gcr_project}/${gcr_image}:${gcr_prod_tag}"
+    labels:
+      - com.centurylinklabs.watchtower.enable: true
     expose:
       - ${env_amatsu_prod_port}
     environment:
@@ -27,6 +29,8 @@ services:
   amatsu-dev:
     container_name: amatsu-dev
     image: "gcr.io/${gcr_project}/${gcr_image}:${gcr_dev_tag}"
+    labels:
+      - com.centurylinklabs.watchtower.enable: true
     expose:
       - ${env_amatsu_dev_port}
     environment:
@@ -76,6 +80,8 @@ services:
   watchtower:
     container_name: watchtower
     image: containrrr/watchtower
+    environment:
+      - WATCHTOWER_LABEL_ENABLE=True
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     depends_on:
