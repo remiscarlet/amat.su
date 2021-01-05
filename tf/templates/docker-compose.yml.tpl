@@ -6,6 +6,11 @@ volumes:
   html:
   dhparam:
   certs:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/home/amatsu/certs/'
   static:
 
 services:
