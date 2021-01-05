@@ -2,6 +2,7 @@
 *.terraform*
 *.swp
 venv/*
+static/*
 *foo.py
 *settings*
 *.pyc

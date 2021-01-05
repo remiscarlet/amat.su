@@ -17,6 +17,8 @@ function urlCallback(){
   var custom = $("#customSuffix").val();
   $.post("/api/", {csrfmiddlewaretoken:csrf,url:$("#url").val(),customSuffix:custom})
     .done(function (data){
+      console.log(data);
+
       var addKaze = $('#addKaze').is(":checked");
       if (addKaze){
         var split = data.split("/");
