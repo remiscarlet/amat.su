@@ -3,11 +3,11 @@ name: Build Production amat.su docker image
 on:
   push:
     branches:
-      - master
       - main
+      - dev
     paths:
-      - '*'
-      - '.github/**'
+      - 'Dockerfile'
+      - 'requirements.txt'
       - 'src/**'
       - '!tf/**'
       - '!**.md'
@@ -42,7 +42,7 @@ jobs:
       -
         name: Build and push Prod
         uses: mr-smithers-excellent/docker-build-push@v5
-        if: steps.extract_branch.outputs.branch == 'master'
+        if: steps.extract_branch.outputs.branch == 'main'
         with:
           image: amatsu/amatsu
           registry: gcr.io
