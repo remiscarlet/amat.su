@@ -13,7 +13,7 @@ services:
     container_name: amatsu-prod
     image: "gcr.io/${gcr_project}/${gcr_image}:${gcr_prod_tag}"
     labels:
-      - com.centurylinklabs.watchtower.enable: true
+      com.centurylinklabs.watchtower.enable: "True"
     expose:
       - ${env_amatsu_prod_port}
     environment:
@@ -32,7 +32,7 @@ services:
     container_name: amatsu-dev
     image: "gcr.io/${gcr_project}/${gcr_image}:${gcr_dev_tag}"
     labels:
-      - com.centurylinklabs.watchtower.enable: true
+      com.centurylinklabs.watchtower.enable: "True"
     expose:
       - ${env_amatsu_dev_port}
     environment:
