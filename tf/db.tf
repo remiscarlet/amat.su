@@ -10,6 +10,12 @@ resource "google_sql_database_instance" "amatsu" {
 
   settings {
     tier = "db-f1-micro"
+    ip_configuration {
+      authorized_networks {
+        name  = "Amatsu"
+        value = google_compute_address.amatsu-prod.address
+      }
+    }
   }
 
   deletion_protection = "true"
