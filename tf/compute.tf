@@ -35,7 +35,7 @@ resource "google_compute_instance" "amatsu-prod" {
   }
 
   metadata = {
-    user-data = data.template_file.cloud-init-prod.rendered
+    user-data = data.null_data_source.cloud-init-prod.outputs["cloud_init_contents"]
     sshKeys   = "${var.gce_ssh_user}:${var.gce_ssh_user_pub}"
   }
 }
