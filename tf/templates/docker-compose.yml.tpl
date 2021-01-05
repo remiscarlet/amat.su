@@ -12,12 +12,6 @@ volumes:
       type: 'none'
       o: 'bind'
       device: '/home/amatsu/certs/'
-  watchtower_config:
-    driver: local
-    driver_opts:
-      type: 'none'
-      o: 'bind'
-      device: '/home/amatsu/watchtower_config.json'
 
 services:
   amatsu-prod:
@@ -95,10 +89,9 @@ services:
   watchtower:
     container_name: watchtower
     image: containrrr/watchtower
-    environment:
-      - WATCHTOWER_LABEL_ENABLE=True
+    command: --interval 30 --label-enable --cleanup
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - watchtower_config:/config.json
+      - /home/amatsu/watchtower_config.json:/config.json
     depends_on:
       - letsencrypt-nginx-proxy

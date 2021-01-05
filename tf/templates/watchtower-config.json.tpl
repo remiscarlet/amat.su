@@ -6,5 +6,5 @@
     },
     "credHelpers": {
         "gcr.io": "gcloud"
-    },
+    }
 }
