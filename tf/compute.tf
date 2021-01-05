@@ -4,7 +4,7 @@ resource "google_compute_address" "amatsu-prod" {
 
 resource "google_compute_instance" "amatsu-prod" {
   name         = "amatsu-prod"
-  machine_type = "f1-micro"
+  machine_type = "g1-small"
   zone         = var.project_zone
 
   allow_stopping_for_update = true
