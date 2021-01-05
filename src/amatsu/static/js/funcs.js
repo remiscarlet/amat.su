@@ -1,5 +1,5 @@
 
-function generateLink(shortURL){
+function populateOutputBox(shortURL){
   var urlBox = $("#output");
   console.log(urlBox);
   console.log(shortURL);
@@ -8,24 +8,29 @@ function generateLink(shortURL){
 
 function changeBackText(){
   $("#copyButton").html("Copy");
-};
+}
 
 
 function urlCallback(){
   var url;
   var csrf = $("[name='csrfmiddlewaretoken']").val();
-  var custom = $("#customURL").val();
+  var custom = $("#customSuffix").val();
   console.log(custom);
-  $.post("/api/", {csrfmiddlewaretoken:csrf,url:$("#url").val(),customURL:custom})
-  .done(function (data){
-
-    var addKaze = $('#addKaze').is(":checked");
-    if (addKaze){
-      var split = data.split("/")
-      data = "http://amat.su/kaze/"+split[3];
-    }
-    generateLink(data);
-  });
+  $.post("/api/", {csrfmiddlewaretoken:csrf,url:$("#url").val(),customSuffix:custom})
+    .done(function (data){
+      var addKaze = $('#addKaze').is(":checked");
+      if (addKaze){
+        var split = data.split("/");
+        console.log(split);
+        var tmp = window.location.href.split("/");
+        var base_url = tmp[0] + "//" + tmp[2];
+        data = base_url+"/kaze/"+split[3];
+      }
+      populateOutputBox(data);
+    })
+    .fail(function (data){
+      populateOutputBox(data.responseText)
+    });
 }
 
 $(document).ready(function () {

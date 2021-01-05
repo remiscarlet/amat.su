@@ -1,4 +1,6 @@
 import django
+
+from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
@@ -6,6 +8,7 @@ from django.http import HttpResponse, Http404
 from django.template import Template, Context, RequestContext
 from django.shortcuts import render
 
+import os
 import re
 import time
 import pytz
@@ -16,166 +19,187 @@ import datetime
 from amatsu import models, hasher
 
 # For easier switching between test and production servers
-HOST_URL = "http://amat.su/"
+HOST_URL = (
+    os.environ.get("VIRTUAL_HOST")
+    if os.environ.get("VIRTUAL_HOST")
+    else settings.REMI_DEV_VM_HOST
+)
+
 
 def index(request):
-  template = django.template.loader.get_template("index.html")
-  randomizedForm = hashlib.md5(str(time.time()).encode()).hexdigest()
-  #context = RequestContext(request, {"randomizedID":randomizedForm})
-  context = {"randomizedID":randomizedForm}
-  html = template.render(context, request=request)
-  return HttpResponse(html)
+    template = django.template.loader.get_template("index.html")
+    randomizedForm = hashlib.md5(str(time.time()).encode()).hexdigest()
+    # context = RequestContext(request, {"randomizedID":randomizedForm})
+    context = {"randomizedID": randomizedForm, "hostname": HOST_URL}
+    html = template.render(context, request=request)
+    return HttpResponse(html)
+
 
 def toHomepage(request):
-  return django.shortcuts.redirect("/kaze/")
-
-def redirect(request,hashed=None):
-  if hashed == None:
     return django.shortcuts.redirect("/kaze/")
 
-  check = models.Url.objects.filter(hashOfUrl=hashed)
-  if len(check) > 0:
-    destUrl = check[0].fullUrl
-    check[0].hits += 1
-    check[0].save()
-    return django.shortcuts.redirect(destUrl)
-  else:
-    return django.shortcuts.redirect(HOST_URL+"/kaze/")
 
-# Helper function for api() to calculate time differences
-def formatTime(inp):
-  inp = str(inp)
-  if inp.find("+")>-1:
-    time = inp[:inp.find("+")]
-  try:
-    return datetime.datetime.strptime(time,"%Y-%m-%d %H:%M:%S.%f")
-  except:
-    # Yikes. Py2 vs py3 datetime default behavior differences.
-    return datetime.datetime.strptime(time,"%Y-%m-%d %H:%M:%S")
+def redirect(request, hashed=None):
+    if hashed == None:
+        return django.shortcuts.redirect("/kaze/")
+
+    check = models.Url.objects.filter(hashOfUrl=hashed)
+    if len(check) > 0:
+        destUrl = check[0].fullUrl
+        check[0].hits += 1
+        check[0].save()
+        return django.shortcuts.redirect(destUrl)
+    else:
+        return django.shortcuts.redirect(HOST_URL + "/kaze/")
 
 
 @csrf_exempt
 def api(request):
 
-  if ("url" not in request.POST or
-      "customURL" not in request.POST or
-      ("csrfmiddlewaretoken" not in request.POST and
-       "isFromExtension" not in request.POST)):
-    raise Http404
+    if (
+        "url" not in request.POST
+        or ("customSuffix" not in request.POST and "customURL" not in request.POST)
+        or (  # customURL backwards compatibility for ff/chrome extensions
+            "csrfmiddlewaretoken" not in request.POST
+            and "isFromExtension" not in request.POST
+        )
+    ):
+        raise Http404
 
-  # Need client IP for flood prevention so need this header.
-  # It's a required header to be standard-compliant.
-  if "REMOTE_ADDR" not in request.META:
-    return HttpResponse("Oops, seems like you're using a non-standard compliant browser!")
+    # Need client IP for flood prevention so need this header.
+    # It's a required header to be standard-compliant.
+    if "REMOTE_ADDR" not in request.META:
+        return HttpResponse(
+            "Oops, seems like you're using a non-standard compliant browser!", content_type="text/plain", status=406
+        )
+    if __shouldAntiFloodActivate(request.META["REMOTE_ADDR"]):
+        return HttpResponse(
+            "Slow down! You're making too many requests!", content_type="text/plain", status=429
+        )
 
-  isFromExtension = "isFromExtension" in request.POST
+    isFromExtension = "isFromExtension" in request.POST
+    url = str(request.POST["url"])
+    customSuffix = (
+        request.POST["customSuffix"]
+        if "customSuffix" in request.POST
+        else request.POST["customURL"]
+    )
 
-  ips = models.IP.objects.filter(ip=request.META["REMOTE_ADDR"])
+    # If we have a custom URL, then validate it.
+    if customSuffix != "":
+        p = re.compile("[^a-zA-Z-_0-9]")
+        results = p.search(customSuffix)
 
-  url = str(request.POST["url"])
-  customURL = request.POST["customURL"]
+        # If not valid, return error message.
+        if results != None:
+            return HttpResponse(
+                "Custom URLs can only contain alphanumeric symbols, - and _",
+                content_type="text/plain", status=400
+            )
+        if len(customSuffix) < 4 or len(customSuffix) > 32:
+            return HttpResponse(
+                "Custom URLs must be between 4 and 32 characters long!",
+                content_type="text/plain", status=400
+            )
 
-  # If we have a custom URL, then validate it.
-  if customURL != "":
-    p = re.compile("[^a-zA-Z-_0-9]")
-    results = p.search(customURL)
-
-    # If not valid, return error message.
-    if results != None:
-      return HttpResponse("Custom URLs can only contain alphanumeric symbols, - and _", content_type="text/plain")
-    if len(customURL) < 4 or len(customURL) > 32:
-      return HttpResponse("Custom URLs must be between 4 and 32 characters long!", content_type="text/plain")
+    return __processUrl(url, customSuffix, isFromExtension)
 
 
-  validator = URLValidator()
-  try:
-    # Validate url to make sure it's valid
-    validator(url)
+def __processUrl(url: str, customSuffix: str, isFromExtension: bool):
+    validator = URLValidator()
+    try:
+        # Validate url to make sure it's valid
+        validator(url)
+    except ValidationError as e:
+        print(e)
+        return HttpResponse(
+            "Please enter a valid and full url!", content_type="text/plain", status=400
+        )
 
-    # First check if we have a custom url. 
+    # First check if we have a custom url.
     # If so, we override the preexisting checks.
-    if customURL != "":
-      # Check if customURL is already in use or not
-      existingCheck = models.Url.objects.filter(hashOfUrl=customURL)
-      if len(existingCheck) > 0:
-        # Check if that full url already exists, eg the exact same parameters
-        if existingCheck[0].fullUrl == url:
-          # Already existed with exact same shortening so might as well return it
-          return HttpResponse(existingCheck[0].shortenedUrl, content_type="text/plain")
+    if customSuffix != "":
+        try:
+            # Check if customSuffix is already in use or not
+            url_obj = models.Url.objects.get(hashOfUrl=customSuffix)
+            # Only error out if custom suffix is used AND dest link are different.
+            if url_obj.fullUrl != url:
+                return HttpResponse(
+                    "That custom URL is already in use!", content_type="text/plain", status=400
+                )
+        except models.Url.DoesNotExist:
+            pass
 
-        # Otherwise we have a conflicting customURL to different redirects
-        return HttpResponse("That custom URL is already in use!", content_type="text/plain")
+        urlSuffix = customSuffix
+    else:
+        # But if it doesn't already exist, just process like normal
+        urlSuffix = __generateOrGetUrlSuffix(url)
 
-      # Else, we're good.
-      returnUrl = HOST_URL+customURL
+    fullShortenedUrl = f"{HOST_URL}{urlSuffix}"
 
-      # Store IP to prevent floods
-      if len(ips)==0:
-        ipObj = models.IP(ip=request.META["REMOTE_ADDR"])
-      else:
-        ipObj = ips[0]
+    if not models.Url.objects.filter(hashOfUrl=urlSuffix).exists():
+        urlObj = models.Url(
+            fullUrl=url,
+            hashOfUrl=urlSuffix,
+            shortenedUrl=fullShortenedUrl,
+            isCustom=(customSuffix != ""),
+            madeByExtension=isFromExtension,
+        )
+        try:
+            urlObj.save()
+        except:
+            return HttpResponse(
+                "Oops something broke! Try again in a bit!", content_type="text/plain", status=500
+            )
+
+    return HttpResponse(fullShortenedUrl, content_type="text/plain", status=200)
+
+
+def __generateOrGetUrlSuffix(url: str) -> str:
+    # First check if we've already hashed this url. If so, return suffix/hash.
+    urlObjs = models.Url.objects.filter(fullUrl=url)
+    if len(urlObjs) > 0:
+        for urlObj in urlObjs:
+            if urlObj.isCustom == False:
+                return urlObj.hashOfUrl
+
+    # Otherwise generate a new suffix/hash
+    urlSuffix = str(url)
+    collission = True
+    while collission:
+        urlSuffix = hasher.returnShortenedSuffix(urlSuffix)
+        if len(models.Url.objects.filter(hashOfUrl=urlSuffix)) == 0:
+            collission = False
+
+    return urlSuffix
+
+
+def __shouldAntiFloodActivate(remote_addr: str) -> bool:
+    try:
+        ipObj = models.IP.objects.get(ip=remote_addr)
+
         # eg, 2016-01-12 16:22:22.129932+00:00
         now = datetime.datetime.now(tz=pytz.utc)
         # If requests are too quick
-        if (formatTime(now)-formatTime(ipObj.lastUsed))<=datetime.timedelta(milliseconds=1000):
-          return HttpResponse("Slow down! You're making too many requests!",content_type="text/plain")
+        if (__formatTime(now) - __formatTime(ipObj.lastUsed)) <= datetime.timedelta(
+            milliseconds=1000
+        ):
+            return True
+
         ipObj.lastUsed = now
-
-
-      ipObj.save()
-
-      urlObj = models.Url(fullUrl=url,
-                          hashOfUrl=customURL,
-                          shortenedUrl=returnUrl,
-                          hits=0, isCustom=True,
-                          madeByExtension=isFromExtension)
-      urlObj.save()
-
-      return HttpResponse(returnUrl, content_type="text/plain")
-
-    check = models.Url.objects.filter(fullUrl=url)
-    if len(check) >0:
-      for url in check:
-        if url.isCustom == False:
-          returnUrl = check[0].shortenedUrl
-          return HttpResponse(returnUrl, content_type="text/plain")
-
-    hashed = str(url)
-    collission = True
-
-    while collission:
-      hashed = hasher.returnShortenedURL(hashed)
-      if len(models.Url.objects.filter(hashOfUrl=hashed)) == 0:
-        collission = False
-
-    returnUrl = HOST_URL+hashed
-    urlObj = models.Url(fullUrl=str(url),
-                        hashOfUrl=hashed,
-                        shortenedUrl=returnUrl,
-                        hits=0,isCustom=False,
-                        madeByExtension=isFromExtension)
-    try:
-      urlObj.save()
-    except:
-      return HttpResponse("Oops something broke! Try again in a bit!", content_type="text/plain")
-
-    if len(ips)==0:
-      ipObj = models.IP(ip=request.META["REMOTE_ADDR"])
-    else:
-      ipObj = ips[0]
-      # eg, 2016-01-12 16:22:22.129932+00:00
-      now = datetime.datetime.now(tz=pytz.utc)
-      # If requests are too quick
-      if (formatTime(now)-formatTime(ipObj.lastUsed))<=datetime.timedelta(milliseconds=1000):
-        return HttpResponse("Slow down! You're making too many requests!",content_type="text/plain")
-      ipObj.lastUsed = now
-
+    except IP.DoesNotExist:
+        ipObj = models.IP(ip=remote_addr)
 
     ipObj.save()
+    return False
 
-    return HttpResponse(returnUrl, content_type="text/plain")
-  except ValidationError as e:
 
-    print(e)
-    return HttpResponse("Please enter a valid and full url!", content_type="text/plain")
-
+def __formatTime(inp):
+    inp = str(inp)
+    if inp.find("+") > -1:
+        time = inp[: inp.find("+")]
+    try:
+        return datetime.datetime.strptime(time, "%Y-%m-%d %H:%M:%S.%f")
+    except:
+        # Yikes. Py2 vs py3 datetime default behavior differences.
+        return datetime.datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
