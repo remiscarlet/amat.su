@@ -15,6 +15,10 @@ resource "google_sql_database_instance" "amatsu" {
         name  = "Amatsu"
         value = google_compute_address.amatsu-prod.address
       }
+      authorized_networks {
+        name  = "Remi Dev"
+        value = var.remi_dev_vm_ip
+      }
     }
   }
 

@@ -18,3 +18,4 @@ variable "gunicorn_user" {}
 variable "gce_ssh_user" {}
 variable "gce_ssh_user_pub" {}
 
+variable "remi_dev_vm_ip" {}
