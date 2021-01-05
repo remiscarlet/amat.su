@@ -13,11 +13,11 @@ services:
     container_name: amatsu-prod
     image: "gcr.io/${gcr_project}/${gcr_image}:${gcr_prod_tag}"
     expose:
-      - 8000
+      - ${env_amatsu_prod_port}
     environment:
       - GUNICORN_USER=${env_gunicorn_user}
       - VIRTUAL_HOST=${env_amatsu_prod_host}
-      - VIRTUAL_PORT=${env_amatsu_port}
+      - VIRTUAL_PORT=${env_amatsu_prod_port}
       - LETSENCRYPT_HOST=${env_amatsu_prod_host}
     volumes:
       - vhost:/app/nginx/vhost.d
@@ -27,11 +27,11 @@ services:
     container_name: amatsu-dev
     image: "gcr.io/${gcr_project}/${gcr_image}:${gcr_dev_tag}"
     expose:
-      - 8001
+      - ${env_amatsu_dev_port}
     environment:
       - GUNICORN_USER=${env_gunicorn_user}
       - VIRTUAL_HOST=${env_amatsu_dev_host}
-      - VIRTUAL_PORT=${env_amatsu_port}
+      - VIRTUAL_PORT=${env_amatsu_dev_port}
       - LETSENCRYPT_HOST=${env_amatsu_dev_host}
     volumes:
       - vhost:/app/nginx/vhost.d
