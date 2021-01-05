@@ -15,6 +15,7 @@ services:
     expose:
       - ${env_amatsu_prod_port}
     environment:
+      - IS_PRODUCTION=1
       - GUNICORN_USER=${env_gunicorn_user}
       - VIRTUAL_HOST=${env_amatsu_prod_host}
       - VIRTUAL_PORT=${env_amatsu_prod_port}
@@ -29,6 +30,7 @@ services:
     expose:
       - ${env_amatsu_dev_port}
     environment:
+      - IS_PRODUCTION=0
       - GUNICORN_USER=${env_gunicorn_user}
       - VIRTUAL_HOST=${env_amatsu_dev_host}
       - VIRTUAL_PORT=${env_amatsu_dev_port}
