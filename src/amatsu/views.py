@@ -58,8 +58,10 @@ def api(request):
 
     if (
         "url" not in request.POST
-        or ("customSuffix" not in request.POST and "customURL" not in request.POST)
-        or (  # customURL backwards compatibility for ff/chrome extensions
+        or (
+            "customSuffix" not in request.POST and "customURL" not in request.POST
+        )  # customURL backwards compatibility for ff/chrome extensions
+        or (
             "csrfmiddlewaretoken" not in request.POST
             and "isFromExtension" not in request.POST
         )
@@ -70,11 +72,15 @@ def api(request):
     # It's a required header to be standard-compliant.
     if "REMOTE_ADDR" not in request.META:
         return HttpResponse(
-            "Oops, seems like you're using a non-standard compliant browser!", content_type="text/plain", status=406
+            "Oops, seems like you're using a non-standard compliant browser!",
+            content_type="text/plain",
+            status=406,
         )
     if __shouldAntiFloodActivate(request.META["REMOTE_ADDR"]):
         return HttpResponse(
-            "Slow down! You're making too many requests!", content_type="text/plain", status=429
+            "Slow down! You're making too many requests!",
+            content_type="text/plain",
+            status=429,
         )
 
     isFromExtension = "isFromExtension" in request.POST
@@ -94,12 +100,14 @@ def api(request):
         if results != None:
             return HttpResponse(
                 "Custom URLs can only contain alphanumeric symbols, - and _",
-                content_type="text/plain", status=400
+                content_type="text/plain",
+                status=400,
             )
         if len(customSuffix) < 4 or len(customSuffix) > 32:
             return HttpResponse(
                 "Custom URLs must be between 4 and 32 characters long!",
-                content_type="text/plain", status=400
+                content_type="text/plain",
+                status=400,
             )
 
     return __processUrl(url, customSuffix, isFromExtension)
@@ -125,7 +133,9 @@ def __processUrl(url: str, customSuffix: str, isFromExtension: bool):
             # Only error out if custom suffix is used AND dest link are different.
             if url_obj.fullUrl != url:
                 return HttpResponse(
-                    "That custom URL is already in use!", content_type="text/plain", status=400
+                    "That custom URL is already in use!",
+                    content_type="text/plain",
+                    status=400,
                 )
         except models.Url.DoesNotExist:
             pass
@@ -149,7 +159,9 @@ def __processUrl(url: str, customSuffix: str, isFromExtension: bool):
             urlObj.save()
         except:
             return HttpResponse(
-                "Oops something broke! Try again in a bit!", content_type="text/plain", status=500
+                "Oops something broke! Try again in a bit!",
+                content_type="text/plain",
+                status=500,
             )
 
     return HttpResponse(fullShortenedUrl, content_type="text/plain", status=200)
