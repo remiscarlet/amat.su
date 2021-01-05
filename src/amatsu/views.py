@@ -28,6 +28,7 @@ HOST_URL = (
 )
 
 import logging
+
 formatter = logging.Formatter("[%(asctime)s][%(levelname)s] %(message)s")
 
 stream_handler = logging.StreamHandler(sys.stdout)
@@ -41,6 +42,7 @@ logger.addHandler(stream_handler)
 
 logger.debug("Testing debug level log")
 logger.warning("Testing warning level log")
+
 
 def index(request):
     template = django.template.loader.get_template("index.html")
@@ -71,23 +73,21 @@ def redirect(request, hashed=None):
 @csrf_exempt
 def api(request):
 
-    if (
-        "url" not in request.POST
-        or (
-            "customSuffix" not in request.POST and "customURL" not in request.POST
-        )  # customURL backwards compatibility for ff/chrome extensions
-        or (
-            "csrfmiddlewaretoken" not in request.POST
-            and "isFromExtension" not in request.POST
-        )
+    if "url" not in request.POST or (
+        "csrfmiddlewaretoken" not in request.POST
+        and "isFromExtension" not in request.POST  # if from extensions, no csrf tokens.
     ):
-        logger.debug(f"Missing required post field params. Rejecting - {request} - {request.POST}")
+        logger.debug(
+            f"Missing required post field params. Rejecting - {request} - {request.POST}"
+        )
         raise Http404
 
     # Need client IP for flood prevention so need this header.
     # It's a required header to be standard-compliant.
     if "REMOTE_ADDR" not in request.META:
-        logger.debug(f"Got request with no REMOTE_ADDR set. Rejecting - {request} - {request.POST}")
+        logger.debug(
+            f"Got request with no REMOTE_ADDR set. Rejecting - {request} - {request.POST}"
+        )
         return HttpResponse(
             "Oops, seems like you're using a non-standard compliant browser!",
             content_type="text/plain",
@@ -103,11 +103,14 @@ def api(request):
 
     isFromExtension = "isFromExtension" in request.POST
     url = str(request.POST["url"])
-    customSuffix = (
-        request.POST["customSuffix"]
-        if "customSuffix" in request.POST
-        else request.POST["customURL"]
-    )
+    if "customSuffix" in request.POST or "customURL" in request.POST:
+        customSuffix = (
+            request.POST["customSuffix"]
+            if "customSuffix" in request.POST
+            else request.POST["customURL"]
+        )
+    else:
+        customSuffix = ""
 
     # If we have a custom URL, then validate it.
     if customSuffix != "":
@@ -116,14 +119,18 @@ def api(request):
 
         # If not valid, return error message.
         if results != None:
-            logger.debug(f"Invalid characters in custom suffix. Rejecting - {request} - {request.POST}")
+            logger.debug(
+                f"Invalid characters in custom suffix. Rejecting - {request} - {request.POST}"
+            )
             return HttpResponse(
                 "Custom URLs can only contain alphanumeric symbols, - and _",
                 content_type="text/plain",
                 status=400,
             )
         if len(customSuffix) < 4 or len(customSuffix) > 32:
-            logger.debug(f"Invalid custom suffix length. Rejecting - {request} - {request.POST}")
+            logger.debug(
+                f"Invalid custom suffix length. Rejecting - {request} - {request.POST}"
+            )
             return HttpResponse(
                 "Custom URLs must be between 4 and 32 characters long!",
                 content_type="text/plain",
@@ -152,7 +159,9 @@ def __processUrl(url: str, customSuffix: str, isFromExtension: bool):
             url_obj = models.Url.objects.get(hashOfUrl=customSuffix)
             # Only error out if custom suffix is used AND dest link are different.
             if url_obj.fullUrl != url:
-                logger.debug(f"Got a custom suffix that's already in use for a different dest link. Rejecting - {request} - {request.POST}")
+                logger.debug(
+                    f"Got a custom suffix that's already in use for a different dest link. Rejecting - {request} - {request.POST}"
+                )
                 return HttpResponse(
                     "That custom URL is already in use!",
                     content_type="text/plain",

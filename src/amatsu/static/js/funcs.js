@@ -15,7 +15,6 @@ function urlCallback(){
   var url;
   var csrf = $("[name='csrfmiddlewaretoken']").val();
   var custom = $("#customSuffix").val();
-  console.log(custom);
   $.post("/api/", {csrfmiddlewaretoken:csrf,url:$("#url").val(),customSuffix:custom})
     .done(function (data){
       var addKaze = $('#addKaze').is(":checked");
