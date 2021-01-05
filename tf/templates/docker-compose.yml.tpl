@@ -73,3 +73,10 @@ services:
     depends_on:
       - nginx-proxy
 
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - letsencrypt-nginx-proxy
