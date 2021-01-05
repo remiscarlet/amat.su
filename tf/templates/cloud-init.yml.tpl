@@ -26,5 +26,6 @@ write_files:
 
 
 runcmd:
+- sudo -u amatsu mkdir -p /home/amatsu/certs
 - systemctl daemon-reload
 - systemctl enable --now --no-block amatsu-compose.service
