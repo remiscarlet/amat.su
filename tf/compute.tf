@@ -12,8 +12,9 @@ data "template_file" "docker-compose" {
     gcr_dev_tag  = var.amatsu_dev_image_tag
 
     env_amatsu_prod_host   = var.amatsu_prod_host
+    env_amatsu_prod_port   = var.amatsu_prod_port
     env_amatsu_dev_host    = var.amatsu_dev_host
-    env_amatsu_port        = var.amatsu_port
+    env_amatsu_dev_port    = var.amatsu_dev_port
     env_amatsu_admin_email = var.amatsu_admin_email
     env_acme_ca_uri        = var.acme_ca_uri
     env_gunicorn_user      = var.gunicorn_user
