@@ -1,5 +1,3 @@
-# resource "google_service_account" "amatsukaze" {} - Made manually through UI to set up app.terraform.io SA.
-
 
 resource "google_service_account" "gcr_uploader" {
   account_id   = "amatsu-gcr-uploader"
