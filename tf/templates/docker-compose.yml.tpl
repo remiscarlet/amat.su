@@ -5,7 +5,8 @@ volumes:
   vhost:
   html:
   dhparam:
-  static:
+  static_prod:
+  static_dev:
   certs:
     driver: local
     driver_opts:
@@ -31,7 +32,7 @@ services:
       - LETSENCRYPT_HOST=${env_amatsu_prod_host}
     volumes:
       - vhost:/app/nginx/vhost.d
-      - static:/app/static
+      - static_prod:/app/static
 
   amatsu-dev:
     container_name: amatsu-dev
@@ -50,7 +51,7 @@ services:
       - LETSENCRYPT_HOST=${env_amatsu_dev_host}
     volumes:
       - vhost:/app/nginx/vhost.d
-      - static:/app/static
+      - static_dev:/app/static
 
   nginx-proxy:
     container_name: nginx-proxy
@@ -59,7 +60,8 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - static:/app/static:ro
+      - static_prod:/app/static/prod:ro
+      - static_dev:/app/static/dev:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - certs:/etc/nginx/certs:ro
       - vhost:/etc/nginx/vhost.d:ro
@@ -77,7 +79,8 @@ services:
       - ACME_CA_URI=${env_acme_ca_uri}
       - NGINX_PROXY_CONTAINER=nginx-proxy
     volumes:
-      - static:/app/static:ro
+      - static_prod:/app/static/prod:ro
+      - static_dev:/app/static/dev:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - certs:/etc/nginx/certs:rw
       - vhost:/etc/nginx/vhost.d
