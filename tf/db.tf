@@ -4,7 +4,7 @@ resource "google_sql_database" "database" {
 }
 
 resource "google_sql_database_instance" "amatsu" {
-  name    = "amatsu-db-instance"
+  name    = "amatsu-db"
   project = var.project_id
   region  = var.project_region
 
