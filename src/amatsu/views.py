@@ -175,7 +175,7 @@ def __processUrl(url: str, customSuffix: str, isFromExtension: bool):
         # But if it doesn't already exist, just process like normal
         urlSuffix = __generateOrGetUrlSuffix(url)
 
-    fullShortenedUrl = f"{HOST_URL}{urlSuffix}"
+    fullShortenedUrl = f"https://{HOST_URL}/{urlSuffix}"
 
     if not models.Url.objects.filter(hashOfUrl=urlSuffix).exists():
         urlObj = models.Url(
