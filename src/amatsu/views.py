@@ -137,10 +137,10 @@ def api(request):
                 status=400,
             )
 
-    return __processUrl(url, customSuffix, isFromExtension)
+    return __processUrl(request, url, customSuffix, isFromExtension)
 
 
-def __processUrl(url: str, customSuffix: str, isFromExtension: bool):
+def __processUrl(request, url: str, customSuffix: str, isFromExtension: bool):
     validator = URLValidator()
     try:
         # Validate url to make sure it's valid

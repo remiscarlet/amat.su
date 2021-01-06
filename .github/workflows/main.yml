@@ -1,4 +1,4 @@
-name: Build Production amat.su docker image
+name: Build amat.su Docker Image
 
 on:
   push:
