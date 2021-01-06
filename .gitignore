@@ -8,4 +8,4 @@ static/*
 *.pyc
 *.sqlite3*
 *.db
-*/migrations/*
+*migrations/

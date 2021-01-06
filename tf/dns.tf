@@ -10,7 +10,7 @@ resource "google_dns_record_set" "amatsu-prod" {
   type         = "A"
   ttl          = 180
 
-  rrdatas = ["72.14.188.154"]
+  rrdatas = [google_compute_address.amatsu-prod.address]
 }
 
 resource "google_dns_record_set" "amatsu-dev" {
