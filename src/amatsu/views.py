@@ -230,7 +230,7 @@ def __shouldAntiFloodActivate(remote_addr: str) -> bool:
             return True
 
         ipObj.lastUsed = now
-    except IP.DoesNotExist:
+    except models.IP.DoesNotExist:
         ipObj = models.IP(ip=remote_addr)
 
     ipObj.save()
